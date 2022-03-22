@@ -32,11 +32,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @MockBean(FileRepository.class)
 class FileControllerTest {
 
-    @Autowired
-    MockMvc mvc;
-
     @MockBean
     FileService fileService;
+
+    @Autowired
+    MockMvc mvc;
 
     @Autowired
     ObjectMapper mapper;
@@ -68,7 +68,7 @@ class FileControllerTest {
                 .mimetype(file.getContentType())
                 .size(file.getSize())
                 .build();
-        val resource = new ResourceWrapper(file.getResource(),fileInfo);
+        val resource = new ResourceWrapper(file.getResource(), fileInfo);
 
         when(fileService.get(uuid)).thenReturn(resource);
 
