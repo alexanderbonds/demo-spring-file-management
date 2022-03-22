@@ -1,0 +1,19 @@
+server:
+  port: 8080
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/storage
+    username: postgres
+    password: 123
+    jpa:
+      show-sql: false
+      database: postgresql
+      hibernate:
+        ddl-auto: validate
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 50MB
+storage:
+  directory: ./storage
