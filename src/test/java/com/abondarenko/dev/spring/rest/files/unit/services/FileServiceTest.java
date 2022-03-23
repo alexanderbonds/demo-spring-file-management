@@ -69,7 +69,7 @@ class FileServiceTest {
                         .mimetype(file.getContentType())
                         .build();
 
-        // try-with-resources to scope static mocking within current class
+        // try-with-resources to scope static mocking within current test method
         try (MockedStatic<UUID> uuidMock = Mockito.mockStatic(UUID.class)) {
             uuidMock.when(UUID::randomUUID).thenReturn(uuid);
             when(fileRepository.save(any(FileInfo.class))).thenReturn(targetFileInfo);

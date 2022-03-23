@@ -6,6 +6,7 @@ import com.abondarenko.dev.spring.rest.files.exceptions.implementations.Resource
 import com.abondarenko.dev.spring.rest.files.models.ResourceWrapper;
 import com.abondarenko.dev.spring.rest.files.repositories.FileRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
@@ -21,7 +22,7 @@ import java.util.UUID;
 
 import static java.lang.String.format;
 
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class FileService {
@@ -33,11 +34,15 @@ public class FileService {
     public UUID store(final MultipartFile file) {
         final UUID uuid = UUID.randomUUID();
 
+        log.info("Generated UUID {} for file {}", uuid, file.getOriginalFilename());
+
         try {
             Files.copy(file.getInputStream(), Paths.get(storageDirectory, uuid.toString()));
         } catch (IOException e) {
             throw new FileServerException("Something went wrong on server side.");
         }
+
+        log.info("File {} saved", file.getOriginalFilename());
 
         final FileInfo fileInfo = FileInfo.builder()
                 .uuid(uuid)
@@ -57,6 +62,8 @@ public class FileService {
             final FileInfo fileInfo = getFileByUuid(uuid);
 
             try {
+                log.info("Found file {} for UUID {}", fileInfo.getFilename(), uuid);
+
                 return new ResourceWrapper(new UrlResource(fileToGet.toUri()), fileInfo);
             } catch (MalformedURLException e) {
                 throw new FileServerException("Something went wrong on server side.");
@@ -69,9 +76,13 @@ public class FileService {
     public void delete(final UUID uuid) {
         final FileInfo fileInfo = getFileByUuid(uuid);
 
+        log.info("Found file {} for UUID {}", fileInfo.getFilename(), uuid);
+
         try {
             Files.deleteIfExists(getPathFromUuid(uuid));
             fileRepository.delete(fileInfo);
+
+            log.info("File {} deleted.", fileInfo.getFilename());
         } catch (IOException e) {
             throw new FileServerException("Something went wrong on server side.");
         }

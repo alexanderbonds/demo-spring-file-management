@@ -4,6 +4,7 @@ package com.abondarenko.dev.spring.rest.files.controllers;
 import com.abondarenko.dev.spring.rest.files.models.ResourceWrapper;
 import com.abondarenko.dev.spring.rest.files.services.FileService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -19,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.UUID;
 
+@Slf4j
 @RestController
 @RequestMapping("/files")
 @RequiredArgsConstructor
@@ -27,12 +29,16 @@ public class FileController {
 
     @PostMapping
     public ResponseEntity<UUID> upload(@RequestParam final MultipartFile file) {
+        log.info("New upload request for file {} ({} bytes)", file.getOriginalFilename(), file.getSize());
+
         final UUID link = fileService.store(file);
         return ResponseEntity.ok().body(link);
     }
 
     @GetMapping("/{uuid}")
     public ResponseEntity<Resource> download(@PathVariable final UUID uuid) {
+        log.info("New download request for UUID {}", uuid);
+
         final ResourceWrapper resource = fileService.get(uuid);
 
         return ResponseEntity.ok()
@@ -46,6 +52,8 @@ public class FileController {
 
     @DeleteMapping("/{uuid}")
     public void delete(@PathVariable final UUID uuid) {
+        log.info("New delete request for file {}", uuid);
+
         fileService.delete(uuid);
     }
 }
